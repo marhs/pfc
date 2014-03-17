@@ -26,6 +26,8 @@ class KeyGenerationCenter:
         for client in users:
             self.users[client] = self.generateSubKey()
 
+        return self.users
+
     def generateSubKey(self):
 
         subkey = getrandbits(self.keySize)
@@ -33,14 +35,33 @@ class KeyGenerationCenter:
             subkey = getrandbits(self.keySize)
 
         return subkey
+
+class User:
+
+    def __init__(self, name):
+        self.name = name
+        self.key = -1
+
+        
+    def recoverKey(self, msg):
+        #TODO
+        
+        return self.key
+
 ## Test zone
 
 kgc = KeyGenerationCenter(8)
 
-users = ['user1','user2']
+
+users = []
+for n in range(8):
+    users.append(User("Name"+str(n)).name)
+
 kgc.generateSubKeys(users)
 print(kgc.key)
 print(kgc.users)
 kgc.sendUsers()
+
+
 
 
