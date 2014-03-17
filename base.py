@@ -1,38 +1,42 @@
 # Protocolo de comparticion de claves
 
-
-
 # SystemRandom usa el generador de numeros aleatorios del sistema
 # /dev/urandom
 # es una clase envoltura de os.urandom
 from random import SystemRandom
 from random import getrandbits
 
-SIZE_KEY = 1024
+class KeyGenerationCenter:
 
-# Generacion de la clave secreta S
+    def __init__(self, keySize):
+        self.keySize = keySize
+        self.key = self.generateKey(keySize)
+        self.users = dict()
+        self.active = 0
+        
+    def generateKey(self, keySize):
 
-def generateGroupKey(secret):
-    
-    return getrandbits(SIZE_KEY)
+        return getrandbits(self.keySize)
 
+    def generateSubKeys(self, users):
+        
+        for client in users:
+            self.users[client] = self.generateSubKey()
 
-# Division de S en n subclaves.
+    def generateSubKey(self):
 
-def generateSubKeys(key):
-    for n in range(10):
-        subkey = getrandbits(SIZE_KEY)
-        while subkey > key:
-            print("Regenerating")
-            subkey = getrandbits(SIZE_KEY)
+        subkey = getrandbits(self.keySize)
+        while subkey > self.key:
+            subkey = getrandbits(self.keySize)
 
-        print(key, " = ", subkey, ' + ', key-subkey)
-    
-    return 0
-
+        return subkey
 ## Test zone
 
-key = generateGroupKey(1)
-generateSubKeys(key)
+kgc = KeyGenerationCenter(8)
+
+users = ['user1','user2']
+kgc.generateSubKeys(users)
+print(kgc.key)
+print(kgc.users)
 
 
