@@ -13,7 +13,10 @@ class KeyGenerationCenter:
         self.key = self.generateKey(keySize)
         self.users = dict()
         self.active = 0
-        
+
+    def sendUsers(self):
+        print(list(self.users.keys()))
+
     def generateKey(self, keySize):
 
         return getrandbits(self.keySize)
@@ -38,5 +41,6 @@ users = ['user1','user2']
 kgc.generateSubKeys(users)
 print(kgc.key)
 print(kgc.users)
+kgc.sendUsers()
 
 
