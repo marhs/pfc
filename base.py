@@ -17,17 +17,19 @@ class KeyGenerationCenter:
     def sendUsers(self):
         print(list(self.users.keys()))
 
+    # Genera S
     def generateKey(self, keySize):
 
         return getrandbits(self.keySize)
 
+    # Divide S en 2 partes por cada usuario. 
     def generateSubKeys(self, users):
         
         for client in users:
             self.users[client] = self.generateSubKey()
 
         return self.users
-
+    # Divide S en 2 partes y lo devuelve (usado en la anterior)
     def generateSubKey(self):
 
         subkey = getrandbits(self.keySize)
@@ -42,7 +44,7 @@ class User:
         self.name = name
         self.key = -1
 
-        
+    # Una vez se tiene el mensaje que envia el KGC, se recupera la clave.
     def recoverKey(self, msg):
         #TODO
         
