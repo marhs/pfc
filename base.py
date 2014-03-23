@@ -6,6 +6,15 @@
 from random import SystemRandom
 from random import getrandbits
 
+# Parametros en comun, grupo generador, etc
+GENERATOR = 3
+MODULUS   = 15
+
+def calculaClave(secret):
+    return pow(GENERATOR, secret, MODULUS)
+
+
+
 class KeyGenerationCenter:
 
     def __init__(self, keySize):
@@ -109,10 +118,13 @@ kgc.recibeRandoms()
 kgc.generateSubKeys()
 print(kgc.key)
 print(kgc.users)
+print(kgc.subkeys)
 print(kgc.randoms)
 
 for n in users:
     print(n.random)
+
+print(calculaClave(kgc.key))
 
 
 
