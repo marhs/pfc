@@ -6,6 +6,8 @@
 from random import SystemRandom
 from random import getrandbits
 
+from hashlib import sha1
+
 # Parametros en comun, grupo generador, etc
 GENERATOR = 3
 MODULUS   = 15
@@ -13,7 +15,19 @@ MODULUS   = 15
 def calculaClave(secret):
     return pow(GENERATOR, secret, MODULUS)
 
+def resumen(parametros):
+    res = sha1()
+    res.update(mensaje)
 
+def encoder(element):
+    return str(element).encode()
+
+def hs(listaElementos):
+    res = sha1()
+    for element in listaElementos:
+        res.update(encoder(element))
+
+    return res.hexdigest()
 
 class KeyGenerationCenter:
 
@@ -23,7 +37,7 @@ class KeyGenerationCenter:
         self.users = []
         self.randoms = []
         self.subkeys = []
-        self.messages = []
+        self.message = []
         self.auth = []
         self.k = 0
         self.active = 0
@@ -70,14 +84,20 @@ class KeyGenerationCenter:
         return subkey
 
     def sendMessage(self):
-        '''
+
         for user in range(len(self.users)):
-            g = 13^(self.subkeys[user]+self.random[user]) # TODO Averiguar como se hace la operacion g^x
-            # Hash
-            hs = [self.users[user],0,0,0]
-            self.message.append([g,self.users[user],hs])
-        '''
+            self.message.append(self.generarMensajeUsuario(user))
         return self.message
+
+    def generarMensajeUsuario(self,indice):
+        ri = self.randoms[indice]
+        ui = self.users[indice]
+        si = self.subkeys[indice]
+        si1 = self.key - self.subkeys[indice]
+
+        g = calculaClave(si+ri)
+        hashMsg = hs([ui,g,si1,ri])
+        return [g,ui,hashMsg]
 
     def generateAuth(self):
         '''
@@ -120,12 +140,12 @@ print(kgc.key)
 print(kgc.users)
 print(kgc.subkeys)
 print(kgc.randoms)
-
+print(kgc.sendMessage())
 for n in users:
     print(n.random)
 
 print(calculaClave(kgc.key))
-
+print(hs([2,1]))
 
 
 
