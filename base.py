@@ -87,7 +87,7 @@ class KeyGenerationCenter:
         return self.message
 
     def generateAuth(self):
-
+        '''
         a = self.generateSubKs()
         b = self.users
         c = self.randoms
