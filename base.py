@@ -5,29 +5,15 @@
 # es una clase envoltura de os.urandom
 from random import SystemRandom
 from random import getrandbits
-
-from hashlib import sha1
+from utils import *
 
 # Parametros en comun, grupo generador, etc
-GENERATOR = 3
-MODULUS   = 15
+GENERATOR = 17
+#MODULUS   = getrandbits(1024)
+MODULUS   = 15643
 
-def calculaClave(secret):
-    return pow(GENERATOR, secret, MODULUS)
+KEYSIZE = 128
 
-def resumen(parametros):
-    res = sha1()
-    res.update(mensaje)
-
-def encoder(element):
-    return str(element).encode()
-
-def hs(listaElementos):
-    res = sha1()
-    for element in listaElementos:
-        res.update(encoder(element))
-
-    return res.hexdigest()
 
 class KeyGenerationCenter:
 
@@ -95,7 +81,7 @@ class KeyGenerationCenter:
         si = self.subkeys[indice]
         si1 = self.key - self.subkeys[indice]
 
-        g = calculaClave(si+ri)
+        g = calculaClave(si+ri,GENERATOR,MODULUS)
         hashMsg = hs([ui,g,si1,ri])
         return [g,ui,hashMsg]
 
@@ -118,7 +104,7 @@ class User:
 
     # Una vez se tiene el mensaje que envia el KGC, se recupera la clave.
     def generateRandom(self):
-        self.random = getrandbits(64)
+        self.random = getrandbits(KEYSIZE)
         return self.random
     def recoverKey(self, msg):
         #TODO
@@ -127,25 +113,29 @@ class User:
 
 ## Test zone
 
-kgc = KeyGenerationCenter(8)
 
+# Inicia un generador de claves
+kgc = KeyGenerationCenter(KEYSIZE)
+
+# Genera 8 usuarios ficticios
 users = []
 for n in range(8):
     users.append(User("Name"+str(n)))
 
-kgc.recibeUsuarios(users)
-kgc.recibeRandoms()
-kgc.generateSubKeys()
-print(kgc.key)
-print(kgc.users)
-print(kgc.subkeys)
-print(kgc.randoms)
-print(kgc.sendMessage())
-for n in users:
-    print(n.random)
+# Computa las comunicaciones entre el KGC y los usuarios
+kgc.recibeUsuarios(users) # Recibe la informacion de los usuarios
+kgc.recibeRandoms()       # Recibe los parametros aleatorios de cada uno
+kgc.generateSubKeys()     # Genera las subclaves si' + si
 
-print(calculaClave(kgc.key))
-print(hs([2,1]))
+
+print("Secreto:   ", kgc.key)
+print("Usuarios:  ", kgc.users)
+print("Randoms:   ", kgc.randoms)
+print("Subclaves: ", kgc.subkeys)
+print("Mensaje:   ")
+mostrarMensaje(kgc.sendMessage())
+
+
 
 
 
