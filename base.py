@@ -47,8 +47,9 @@ class KeyGenerationCenter:
             
     # Genera S
     def generateKey(self, keySize):
-
-        return getrandbits(self.keySize)
+        s = getrandbits(self.keySize)
+        self.k = calculaClave(s,GENERATOR,MODULUS)
+        return s
 
     # Divide S en 2 partes por cada usuario. 
     def generateSubKeys(self):
@@ -83,17 +84,14 @@ class KeyGenerationCenter:
 
         g = calculaClave(si+ri,GENERATOR,MODULUS)
         hashMsg = hs([ui,g,si1,ri])
-        self.message = [g,ui,hashMsg]
-        return self.message
+        message = [g,ui,hashMsg]
+        return message
 
     def generateAuth(self):
-        '''
-        a = self.generateSubKs()
+        a = self.message
         b = self.users
         c = self.randoms
-        return [self.k,a,b,c]
-        '''
-        return 0
+        return hs([self.k,a,b,c])
 
 class User:
 
@@ -135,6 +133,8 @@ print("Randoms:   ", kgc.randoms)
 print("Subclaves: ", kgc.subkeys)
 print("Mensaje:   ")
 mostrarMensaje(kgc.sendMessage())
+
+print("Auth:   ", kgc.generateAuth())
 
 
 
