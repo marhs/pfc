@@ -83,10 +83,11 @@ class KeyGenerationCenter:
 
         g = calculaClave(si+ri,GENERATOR,MODULUS)
         hashMsg = hs([ui,g,si1,ri])
-        return [g,ui,hashMsg]
+        self.message = [g,ui,hashMsg]
+        return self.message
 
     def generateAuth(self):
-        '''
+
         a = self.generateSubKs()
         b = self.users
         c = self.randoms
