@@ -22,7 +22,7 @@ class KeyGenerationCenter:
         self.key = self.generateKey(keySize)
         self.users = []
         self.randoms = []
-        self.subkeys = []
+        self.subkeys = dict()
         self.message = []
         self.auth = []
         self.k = 0
@@ -31,7 +31,8 @@ class KeyGenerationCenter:
         self.objUsuarios = []
 
     def recibeUsuarios(self, listaUsuarios):
-        # Inicio de protocolo, limpia los parametros activos
+    # Inicio de protocolo, limpia los parametros activos
+    # TODO Implementar la autenticacion aqui
         self.users, self.randoms, self.objUsuarios = [],[],[]
 
         self.objUsuarios = listaUsuarios
@@ -54,10 +55,10 @@ class KeyGenerationCenter:
     # Divide S en 2 partes por cada usuario. 
     def generateSubKeys(self):
         # Primero limpia las subclaves que pudiesen existir
-        self.subkeys = []
+        self.subkeys = dict()
         for client in self.users:
             key = self.generateSubKey()
-            self.subkeys.append(key)
+            self.subkeys[client] = key
 
         return self.users
 
@@ -74,16 +75,18 @@ class KeyGenerationCenter:
 
         for user in range(len(self.users)):
             self.message.append(self.generarMensajeUsuario(user))
+        self.message.append(self.generateAuth())
         return self.message
 
     def generarMensajeUsuario(self,indice):
         ri = self.randoms[indice]
         ui = self.users[indice]
-        si = self.subkeys[indice]
-        si1 = self.key - self.subkeys[indice]
+        si = self.subkeys[ui]
+        si1 = self.key - si
 
         g = calculaClave(si+ri,GENERATOR,MODULUS)
-        hashMsg = hs([ui,g,si1,ri])
+        h = [ui,g,si1,ri]
+        hashMsg = hs(h)
         message = [g,ui,hashMsg]
         return message
 
@@ -93,6 +96,9 @@ class KeyGenerationCenter:
         c = self.randoms
         return hs([self.k,a,b,c])
 
+    def sendSubKey(self, user):
+        return self.key - self.subkeys[user] 
+
 class User:
 
     def __init__(self, name):
@@ -100,15 +106,37 @@ class User:
         self.random = -1 
         self.subkey = -1
         self.key = -1
+        self.msg = []
+
+        self.publicUsers = []
+        self.publicRandoms = []
+        self.publicValues = []
 
     # Una vez se tiene el mensaje que envia el KGC, se recupera la clave.
     def generateRandom(self):
         self.random = getrandbits(KEYSIZE)
         return self.random
-    def recoverKey(self, msg):
-        #TODO
+    
+    def recoverKey(self, kgc):
         
-        return self.key
+        self.subkey = kgc.sendSubKey(self.name)
+        return self.subkey
+    
+    def recoverMsg(self, m): 
+         
+        for n in m[:-1]: 
+            self.publicValues.append(n[0])
+            self.publicUsers.append(n[1])
+            if n[1] == self.name:
+                self.msg = n
+        if self.msg:
+            return self.msg
+        else:
+            return False
+
+    def genH(self):
+        r = [self.name, self.msg[0], self.subkey, self.random]
+        return hs(r)
 
 ## Test zone
 
@@ -126,15 +154,31 @@ kgc.recibeUsuarios(users) # Recibe la informacion de los usuarios
 kgc.recibeRandoms()       # Recibe los parametros aleatorios de cada uno
 kgc.generateSubKeys()     # Genera las subclaves si' + si
 
-
 print("Secreto:   ", kgc.key)
 print("Usuarios:  ", kgc.users)
-print("Randoms:   ", kgc.randoms)
-print("Subclaves: ", kgc.subkeys)
-print("Mensaje:   ")
-mostrarMensaje(kgc.sendMessage())
+print("Randoms:")
+for n in range(len(kgc.randoms)):
+    print('     ',kgc.users[n],kgc.randoms[n])
 
-print("Auth:   ", kgc.generateAuth())
+print("Subclaves:")
+for n in range(len(kgc.randoms)):
+    print('     ',kgc.users[n],kgc.subkeys[kgc.users[n]])
+    
+print("Mensaje:   ")
+msg = kgc.sendMessage()
+mostrarMensaje(msg)
+
+auth = msg[len(msg)-1]
+print('Auth: ',auth)
+
+
+for user in users:
+    user.recoverKey(kgc)
+    user.recoverMsg(msg)
+    print('Hash user',user.genH())
+
+    
+
 
 
 
