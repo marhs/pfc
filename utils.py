@@ -38,6 +38,6 @@ def modInverse(a,b):
     return eu[1]%b
 
 # Equivalente a resolver la ecuacion clave que devuelve K'
-def despejarClave(gs1,gs2r,gr,mod):
+def keyRecover(gs1,gs2r,gr,mod):
     r = gs1*gs2r%mod
     return r * modInverse(gr,mod)%mod
