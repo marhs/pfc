@@ -2,12 +2,14 @@
 \usepackage[spanish]{babel}
 \selectlanguage{spanish}
 \usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+% TODO Configurar el documento para que use codigo python
+\usepackage{listings}
 
 \begin{document}
 
 \title{Descripción y analisis de un protocolo autenticado de transferencia de claves en grupo basado en la comparticion de secretos.}
 \author{Marco Herrero Serna,\\
-        Departamento de Matematica Aplicada 1,\\
         Escuela Tecnica Superior de Ingeniería Informatica,\\
         Universidad de Sevilla\\
         \texttt{me@marhs.de}}
@@ -41,6 +43,22 @@ Descripcion y limitaciones
 
 \section{Implementación}
 Interfaz grafica, kivy pyinstaller, etc. 
+
+Uno de los problemas planteados para la implementación es la solución de la ecuación
+
+\begin{equation}
+    K' = g^{s_{i}'} * g^{s_{i}+r_{i}} / g^{r_{i}}
+\end{equation}
+
+dónde al conocer los valores ya calculados de $ g^{s_{i}'} $, etc, no se puede continuar con artimetica clásica y debemos operar con aritmetica modular. Para esto, se ha usado el algoritmo extendido de euclides y la identidad de bezout. 
+
+Para esto se tiene el siguiente código:
+
+\begin{lstlisting}
+def boring(args = None):
+    pass
+\end{lstlisting}
+
 
 \section{Manual de usuario}
 
