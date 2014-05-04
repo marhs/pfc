@@ -23,3 +23,9 @@ def hs(listaElementos):
 def mostrarMensaje(mensaje):
     for msg in mensaje:
         print(msg)
+
+def extEuclides(a,b):
+
+    # TODO
+
+    return [1,2,3,4]
