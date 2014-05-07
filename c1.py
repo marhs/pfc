@@ -1,25 +1,29 @@
 # telnet program example
 import socket, select, string, sys
+import user
 state = 0 
 
+
+## CAREFUL HERE BE DRAGONS
+# TODO Anadir excepciones para el sys.argv
+u = user.User(sys.argv[1])
 #main function
 
 host = 'localhost'    
-port = 5000
+port = int(sys.argv[2])
 myData = ['helmetk','123123141']
-name = 'helmetk'
 rand = 1231151
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.settimeout(20)
  
 def send0(s,msg):
     global state
-    msg = str(state) + ':' + name+':'+ str(msg)
+    msg = str(state) + ':' + u.name+':'+ str(msg)
     print 'MSG SENT: ',msg
     s.send(msg)
     return 0
 
-def analizeData(s,msg):
+def processData(s,msg):
     global state
     msg_data = msg.split(':') # TODO Split(':',2)o
     if state > 1:
@@ -27,8 +31,10 @@ def analizeData(s,msg):
         return True
     if state == 0 or state == int(msg[0]):
         # DO ACTIONS
-        send0(s,myData[state])
+        send0(s,u.name)
         state += 1
+    elif state == 1:
+        send0(s,rand)
     return 0
 # connect to remote host
 try :
@@ -38,7 +44,7 @@ except :
     sys.exit()
 
 ## SEND THE FIRST MESSAGE
-analizeData(s,name)
+processData(s,u.name)
  
 
 ## BUCLE DE ESPERA 
@@ -51,7 +57,7 @@ while 1:
     for sock in read_sockets:
         #incoming message from remote server
         if sock == s:
-            data = sock.recv(4096)
+            data = sock.recv(1024)
             if not data :
                 print '\nDisconnected from chat server'
                 sys.exit()
@@ -59,7 +65,7 @@ while 1:
                 # Ha recibido datos
                 # Comprobar el estado, si todo va bien, enviar el siguiente estado
                 print 'Data received: ', data
-                analizeData(s,data)
+                processData(s,data)
                 
          
         #user entered a message

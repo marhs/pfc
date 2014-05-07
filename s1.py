@@ -1,13 +1,18 @@
 # Tcp Chat server
  
 import socket, select
+import kgc
 state = 0 
 participants = []
 
 PORT = 5000
+
+#######
+k = kgc.KeyGenerationCenter(128,2)
+
+#######
 # Hace BROADCAST de un mensaje a todos los sockets activos. 
 def broadcast_data (message):
-    #Do not send the message to master socket and the client who has send us the message
     global state
     message = str(state)+':server:'+message
     for socket in CONNECTION_LIST:
@@ -19,10 +24,14 @@ def broadcast_data (message):
                 # tanto habria que parar el protocolo. TODO 
                 socket.close()
                 CONNECTION_LIST.remove(socket)
- 
-def analizeData(data):
+
+
+# Tratamiento de datos recibidos. 
+def processData(data):
+
     global state
-    print '   Analizing data'
+
+    print '   Analizing data', data
     d = data.split(':')
     if len(d)!=3:
         return False
@@ -30,6 +39,8 @@ def analizeData(data):
     if d[0] == '0':
         print '    Adding participant '+str(d[0])
         participants.append(d[1])
+        if k.addUser(d[1]) == 1:
+            print 'Usuarios k: ',k.users
 
         if len(participants) == 2 and state == 0:
             broadcast_data(str(participants))
@@ -76,7 +87,7 @@ while 1:
 
                 data = sock.recv(RECV_BUFFER)
                 if data:
-                    analizeData(data)
+                    processData(data)
           
                 #In Windows, sometimes when a TCP program closes abruptly,
                 # a "Connection reset by peer" exception will be thrown
