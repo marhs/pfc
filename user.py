@@ -36,7 +36,6 @@ class User:
             return 'OK'
     def generateRandom(self):
         self.random = getrandbits(KEYSIZE)
-        self.state += 1
         return self.random
     
     def recoverKey(self, kgc):

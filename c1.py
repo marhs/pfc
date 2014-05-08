@@ -1,6 +1,7 @@
 # telnet program example
 import socket, select, string, sys
 import user
+import json
 state = 0 
 
 
@@ -24,17 +25,24 @@ def send0(s,msg):
     return 0
 
 def processData(s,msg):
+    print 'processingData(',msg
     global state
     msg_data = msg.split(':') # TODO Split(':',2)o
-    if state > 1:
-        print 'State > 1'
-        return True
-    if state == 0 or state == int(msg[0]):
+    state = int(msg_data[0])
+    print 'State =',state
+    if state == 0 :
         # DO ACTIONS
-        send0(s,u.name)
+        send0(s,u.getData())
         state += 1
     elif state == 1:
-        send0(s,rand)
+        send0(s,u.getData())
+        state = msg_data[0]
+        print state
+    elif state > 2:
+        return True
+    elif state == 2:
+        send0(s,'rdy')
+        print 'Estado 2'
     return 0
 # connect to remote host
 try :
@@ -44,7 +52,7 @@ except :
     sys.exit()
 
 ## SEND THE FIRST MESSAGE
-processData(s,u.name)
+processData(s,'0:'+u.name+':'+u.name)
  
 
 ## BUCLE DE ESPERA 
@@ -57,7 +65,7 @@ while 1:
     for sock in read_sockets:
         #incoming message from remote server
         if sock == s:
-            data = sock.recv(1024)
+            data = sock.recv(4096)
             if not data :
                 print '\nDisconnected from chat server'
                 sys.exit()

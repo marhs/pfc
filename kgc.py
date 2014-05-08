@@ -28,12 +28,13 @@ class KeyGenerationCenter:
 
     def getData(self):
         s = self.state
-        if s == -1:
+        if s == 1:
             return self.users
-        elif s == 0:
+        elif s == 2:
             return self.randoms
-        elif s == 1:
-            return message
+        elif s == 3:
+            print 'SSState 3'
+            return self.sendMessage()
 
     def addUser(self,user):
     # Inicio de protocolo, limpia los parametros activos
@@ -47,11 +48,19 @@ class KeyGenerationCenter:
     # Empieza en S1 y al acabar pasa a S2.
     def recibeRandom(self, user, random):
         self.randoms[user] = random
+        print self.randoms
         if len(self.randoms) == self.numUsers:
             self.state += 1
             # TODO Enviar randoms()
-        return self.randoms
+        print 'recibeRandom(',self.state,user,random,')'
+        return self.state
             
+
+    def userRdy(self):
+        self.active += 1
+        if self.active == self.numUsers:
+            self.state += 1
+        return self.state
     # Genera S
     def generateKey(self, keySize):
         s = getrandbits(self.keySize)
@@ -79,15 +88,16 @@ class KeyGenerationCenter:
 
     def sendMessage(self):
 
-        for user in range(len(self.users)):
+        for user in range(self.numUsers):
             self.message.append(self.generarMensajeUsuario(user))
         self.message.append(self.generateAuth())
         return self.message
 
     # Genera Mi, para cada uno de los usuarios, dado su indice. 
     def generarMensajeUsuario(self,indice):
-        ri = self.randoms[indice]
+        print 'sss'
         ui = self.users[indice]
+        ri = self.randoms[ui]
         si = self.subkeys[ui]
         si1 = self.key - si
 
