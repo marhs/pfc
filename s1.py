@@ -29,7 +29,7 @@ def broadcast_data (message):
 
 
 # Tratamiento de datos recibidos. 
-def processData(data):
+def processData(sock,data):
     global state
     print '   Analizing data', data
     d = data.split(':')
@@ -42,6 +42,7 @@ def processData(data):
     if d[0] == '0':
         print '    Adding participant '+str(d[2])
         state = k.addUser(d[1]) 
+        sock.send('-1:server:'+str(k.subkeys[d[1]]))
         if state == 1:
             print 'Usuarios k: ',k.users
             print k.getData()
@@ -65,9 +66,9 @@ def processData(data):
             state = k.userRdy()
         if state == 3:
             print 'Ship rdy, pal'
-            #msg = k.getData()
-            #print msg
-            #broadcast_data(msg)
+            msg = k.getData()
+            print msg
+            broadcast_data(msg)
         
 
     return True
@@ -106,7 +107,7 @@ while 1:
 
                 data = sock.recv(RECV_BUFFER)
                 if data:
-                    processData(data)
+                    processData(sock,data)
           
                 #In Windows, sometimes when a TCP program closes abruptly,
                 # a "Connection reset by peer" exception will be thrown

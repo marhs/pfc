@@ -43,6 +43,8 @@ def processData(s,msg):
     elif state == 2:
         send0(s,'rdy')
         print 'Estado 2'
+    elif state == -1:
+        u.subkey = msg_data[2]
     return 0
 # connect to remote host
 try :

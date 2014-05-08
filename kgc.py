@@ -40,6 +40,7 @@ class KeyGenerationCenter:
     # Inicio de protocolo, limpia los parametros activos
 
         self.users.append(user)
+        self.subkeys[user] = self.generateSubKey()
         if len(self.users) == self.numUsers:
             self.state += 1
             # TODO Enviar users()
