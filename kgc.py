@@ -57,6 +57,10 @@ class KeyGenerationCenter:
         return self.state
             
 
+    def resetUserRdy(self)
+        self.active = 0
+        return self.active
+
     def userRdy(self):
         self.active += 1
         if self.active == self.numUsers:
