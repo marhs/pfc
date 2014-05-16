@@ -16,6 +16,7 @@ def broadcast_data (message):
 # Hace BROADCAST de un mensaje a todos los sockets activos. 
     # TODO Enviar en json y recibir en json
     global state
+    print '[',state,'] SENT:', message 
     message = str(k.state)+':server:'+str(message)
     for socket in CONNECTION_LIST:
         if socket != server_socket:
@@ -31,45 +32,56 @@ def broadcast_data (message):
 # Tratamiento de datos recibidos. 
 def processData(sock,data):
     global state
-    print '   Analizing data', data
+    print '[',state,'] RECV:', data  
     d = data.split(':')
     if len(d)!=3:
         return False
 
     # Estado 0: Capturar los participantes. 
-    # TODO: Aqui es donde deberia enviar POR SEPARADO la subclave. 
     # Lo dejamos para bingo
-    if d[0] == '0':
-        print '    Adding participant '+str(d[2])
-        state = k.addUser(d[1]) 
-        sock.send('-1:server:'+str(k.subkeys[d[1]]))
+    if d[0] == '0' or d[0] == '1':
+        # Pueden llegar dos posibles respuestas: El nombre y el ACK
+
+        # Llega el nombre - addUser
+        if d[0] == '0':
+            print '    Adding participant '+str(d[2])
+            state = k.addUser(d[1]) # TODO Que hace esto? Mejor/que devuelve?
+            # Entonces envia la clave
+            msg_sent = '0:server:'+str(k.subkeys[d[1]])
+            print '[',state,'] SENT:', msg_sent  
+            sock.send(msg_sent)
+
+        # Llega la clave - userRdy
+        else:
+            if d[2] != 'ACK':
+                print 'ERROR, DATO 2 != ACK'
+            else:
+                state = k.userRdy()
+
+        # Si todos los usuarios han enviado el ACK, se envia la lista de users
         if state == 1:
-            print 'Usuarios k: ',k.users
-            print k.getData()
-            broadcast_data(k.getData())
+            msg_sent = k.getData()
+            broadcast_data(msg_sent)
+            #k.resetUserRdy()
             return True
 
-    elif d[0] == '1':
-        # Estado 1, recibe los randoms, los almacena y cuando los tiene todos los envia
-
-        print d
-        state = k.recibeRandom(d[1],int(d[2])) 
-        if state == 2:
-            print '    Random completados'
-            print k.getData()
-            broadcast_data(k.getData())
 
     elif d[0] == '2':
+        # Estado 1, recibe los randoms, los almacena y cuando los tiene todos los envia
+        k.resetUserRdy()
+
+        state = k.recibeRandom(d[1],int(d[2])) 
+        if state == 2:
+            broadcast_data(k.getData())
+
+    elif d[0] == '3':
         # Recibe los ACK de todos los participantes y envia el M,Auth
-        print d
-        if d[2] == 'rdy':
+        print '    ',d
+        if d[2] == 'ACK':
             state = k.userRdy()
         if state == 3:
-            print 'Ship rdy, pal'
             msg = k.getData()
-            print msg
             broadcast_data(msg)
-        
 
     return True
 

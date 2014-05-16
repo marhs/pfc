@@ -31,9 +31,13 @@ class User:
             self.state += 1
             return self.name
         if s == 1:
-            return self.generateRandom()
+            self.state +=1
+            return 'ACK'
         if s == 2:
-            return 'OK'
+            self.state += 1
+            return self.generateRandom()
+        if s == 3:
+            return 'ACK'
     def generateRandom(self):
         self.random = getrandbits(KEYSIZE)
         return self.random

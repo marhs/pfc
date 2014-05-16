@@ -28,12 +28,13 @@ class KeyGenerationCenter:
 
     def getData(self):
         s = self.state
-        if s == 1:
+        if s == 0:
+            return False
+        elif s == 1:
             return self.users
         elif s == 2:
             return self.randoms
         elif s == 3:
-            print 'SSState 3'
             return self.sendMessage()
 
     def addUser(self,user):
@@ -41,23 +42,23 @@ class KeyGenerationCenter:
 
         self.users.append(user)
         self.subkeys[user] = self.generateSubKey()
-        if len(self.users) == self.numUsers:
-            self.state += 1
+        #if len(self.users) == self.numUsers:
+        #    self.state += 1
             # TODO Enviar users()
         return self.state
 
     # Empieza en S1 y al acabar pasa a S2.
     def recibeRandom(self, user, random):
         self.randoms[user] = random
-        print self.randoms
+        print '    ',self.randoms
+        print '    recibeRandom(',self.state,user,random,')'
         if len(self.randoms) == self.numUsers:
             self.state += 1
             # TODO Enviar randoms()
-        print 'recibeRandom(',self.state,user,random,')'
         return self.state
             
 
-    def resetUserRdy(self)
+    def resetUserRdy(self):
         self.active = 0
         return self.active
 
@@ -65,6 +66,7 @@ class KeyGenerationCenter:
         self.active += 1
         if self.active == self.numUsers:
             self.state += 1
+        print ' [Active]', self.active ,'/',self.numUsers
         return self.state
     # Genera S
     def generateKey(self, keySize):
@@ -100,7 +102,6 @@ class KeyGenerationCenter:
 
     # Genera Mi, para cada uno de los usuarios, dado su indice. 
     def generarMensajeUsuario(self,indice):
-        print 'sss'
         ui = self.users[indice]
         ri = self.randoms[ui]
         si = self.subkeys[ui]

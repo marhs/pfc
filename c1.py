@@ -20,32 +20,45 @@ s.settimeout(20)
 def send0(s,msg):
     global state
     msg = str(state) + ':' + u.name+':'+ str(msg)
-    print 'MSG SENT: ',msg
+    print '[',state,'] SENT:', msg  
     s.send(msg)
     return 0
 
 def processData(s,msg):
-    print 'processingData(',msg
+    if msg == '': #Dato vacio, mensaje inicial. 
+        send0(s,u.getData())
+        return 0
+
     global state
     msg_data = msg.split(':') # TODO Split(':',2)o
     state = int(msg_data[0])
-    print 'State =',state
+    print '[',state,'] RECV:', msg_data  
+
     if state == 0 :
-        # DO ACTIONS
-        send0(s,u.getData())
+        # Recibe subclave y envia ACK 0/1
+        u.subkey = msg_data[2]
         state += 1
-    elif state == 1:
         send0(s,u.getData())
-        state = msg_data[0]
-        print state
+    elif state == 1:
+        # Recibe users y envia el random
+        u.users = msg_data[2]
+        state += 1
+        send0(s,u.getData())
+    elif state == 2:
+        # Recibe randoms[] y envia ACK
+        u.randoms = msg_data[2]
+        state += 1
+        send0(s,'ACK')
+    elif state == 3:
+        # Recibe el MAuth, genera el H, K y hi
+
+        # Generacion de H,K,hi
+        # Comprobacion
+        # Envio
+        # Todo esto deberia hacerse en el user.py
+        return 0
     elif state > 2:
         return True
-    elif state == 2:
-        send0(s,'rdy')
-        print 'Estado 2'
-    elif state == -1:
-        u.subkey = msg_data[2]
-    return 0
 # connect to remote host
 try :
     s.connect((host, port))
@@ -54,13 +67,13 @@ except :
     sys.exit()
 
 ## SEND THE FIRST MESSAGE
-processData(s,'0:'+u.name+':'+u.name)
+processData(s,'')
  
 
 ## BUCLE DE ESPERA 
 while 1:
     socket_list = [s]
-    print 'Esperando respuesta del servidor en estado ' +str(state) 
+    #print 'Esperando respuesta del servidor en estado ' +str(state) 
     # Get the list sockets which are readable
     read_sockets, write_sockets, error_sockets = select.select(socket_list , [], [])
      
@@ -74,7 +87,7 @@ while 1:
             else :
                 # Ha recibido datos
                 # Comprobar el estado, si todo va bien, enviar el siguiente estado
-                print 'Data received: ', data
+                #print 'Data received: ', data
                 processData(s,data)
                 
          
