@@ -51,7 +51,8 @@ def processData(s,msg):
         send0(s,'ACK')
     elif state == 3:
         # Recibe el MAuth, genera el H, K y hi
-
+        u.recoverMsg(msg_data[2])
+        print u.genH()
         # Generacion de H,K,hi
         # Comprobacion
         # Envio

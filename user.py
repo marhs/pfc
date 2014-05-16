@@ -38,20 +38,24 @@ class User:
             return self.generateRandom()
         if s == 3:
             return 'ACK'
+        
+        ## Espero que se haya hecho el recover msg
+
+
+    
     def generateRandom(self):
         self.random = getrandbits(KEYSIZE)
         return self.random
     
-    def recoverKey(self, kgc):
-        
-        self.subkey = kgc.sendSubKey(self.name)
-        return self.subkey
-    
+    # Coge el mensaje M y devuelve el g si+r correspondiente al usuario. 
+    # Ahora toca JSON JSON JSON 
     def recoverMsg(self, m): 
-         
+        print '  Mensaje:',m
+        # Recorremos los M sin el Auth. 
         for n in m[:-1]: 
-            self.publicValues.append(n[0])
-            self.publicUsers.append(n[1])
+            print '    M:',n
+            #self.publicValues.append(n[0])
+            #self.publicUsers.append(n[1])
             if n[1] == self.name:
                 self.msg = n
         if self.msg:
