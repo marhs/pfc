@@ -19,7 +19,8 @@ class KeyGenerationCenter:
         self.subkeys = dict()
         self.message = []
         self.auth = []
-        self.k = 0
+        self.k = calculaClave(self.key,GENERATOR,MODULUS)
+        self.subk  = dict()
         self.active = 0
 
         self.objUsuarios = []
@@ -50,8 +51,6 @@ class KeyGenerationCenter:
     # Empieza en S1 y al acabar pasa a S2.
     def recibeRandom(self, user, random):
         self.randoms[user] = random
-        print '    ',self.randoms
-        print '    recibeRandom(',self.state,user,random,')'
         if len(self.randoms) == self.numUsers:
             self.state += 1
             # TODO Enviar randoms()
@@ -72,6 +71,7 @@ class KeyGenerationCenter:
     def generateKey(self, keySize):
         s = getrandbits(self.keySize)
         self.k = calculaClave(s,GENERATOR,MODULUS)
+        print '    CLAVE:',self.k
         return s
 
     # Divide S en 2 partes por cada usuario. 
@@ -108,6 +108,7 @@ class KeyGenerationCenter:
         si1 = self.key - si
 
         g = calculaClave(si1+ri,GENERATOR,MODULUS)
+        self.subk[ui] = g
         h = [ui,g,si,ri]
         print '    GenH:',h
         hashMsg = hs(h)
@@ -116,11 +117,23 @@ class KeyGenerationCenter:
 
     # Genera el mensaje final Auth
     def generateAuth(self):
-        a = self.message
         b = self.users
-        c = self.randoms
-        return hs([self.k,a,b,c])
+        a = []
+        c = []
+        for user in b:
+            c.append(self.randoms[user])
+            a.append(self.subk[user])
+
+        return hs([self.k]+a+b+c)
 
     # Devuelve si' (la que se envia, creo)
     def getSubKey(self, user):
         return self.key - self.subkeys[user] 
+
+
+    def generateHi(self,user):
+        res = [self.subkeys[user],self.k]
+        res = res + self.users
+        for n in self.users:
+            res.append(self.randoms[n])
+        return hs(res)

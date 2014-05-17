@@ -85,6 +85,11 @@ def processData(sock,data):
             msg = k.getData()
             broadcast_data(msg)
 
+
+    elif d[0] == '4':
+        print 'Datos recibidos 4'
+        #print k.generateHi()
+        print d[2] == k.generateHi(d[1])
     return True
 
 
@@ -94,7 +99,7 @@ CONNECTION_LIST = []
 RECV_BUFFER = 4096 # Advisable to keep it as an exponent of 2
  
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_socket.bind(("localhost", PORT))
+server_socket.bind(("0.0.0.0", PORT))
 server_socket.listen(20)
 
 # Add server socket to the list of readable connections

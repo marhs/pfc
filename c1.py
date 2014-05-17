@@ -49,9 +49,10 @@ def processData(s,msg):
         send0(s,u.getData())
     elif state == 2:
         # Recibe randoms[] y envia ACK
-        u.randoms = json.loads(msg_data[2])
+        u.publicRandoms = json.loads(msg_data[2])
         state += 1
-        send0(s,'ACK')
+        #send0(s,'ACK')
+        send0(s,u.getData())
     elif state == 3:
         # Recibe el MAuth, genera el H, K y hi
         hlocal = u.recoverMsg(json.loads(msg_data[2]))
@@ -61,10 +62,12 @@ def processData(s,msg):
             # TODO Fallo del algoritmo, no se ha comprobado envia FAIL y vuelve
             print 'FAIL'
             return 0
-        # Generacion de H,K,hi
-        # Comprobacion
-        # Envio
-        # Todo esto deberia hacerse en el user.py
+        u.recoverKey()
+        u.generateAuth()
+        u.computeHi()
+
+        state += 1
+        send0(s,u.getData())
         return 0
     elif state > 2:
         return True
