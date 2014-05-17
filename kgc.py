@@ -108,7 +108,8 @@ class KeyGenerationCenter:
         si1 = self.key - si
 
         g = calculaClave(si+ri,GENERATOR,MODULUS)
-        h = [ui,g,si1,ri]
+        h = [ui,g,si,ri]
+        print '    GenH:',h
         hashMsg = hs(h)
         message = [g,ui,hashMsg]
         return message

@@ -30,29 +30,37 @@ def processData(s,msg):
         return 0
 
     global state
-    msg_data = msg.split(':') # TODO Split(':',2)o
+    msg_data = msg.split(':',2) # TODO Split(':',2)o
     state = int(msg_data[0])
     print '[',state,'] RECV:', msg_data  
 
     if state == 0 :
         # Recibe subclave y envia ACK 0/1
-        u.subkey = msg_data[2]
+        # TODO json.loads carga un long en la subkey, ver si eso reporta problemas
+        u.subkey = json.loads(msg_data[2])
         state += 1
         send0(s,u.getData())
     elif state == 1:
         # Recibe users y envia el random
-        u.users = msg_data[2]
+        # TODO json.loads carga aqui un unicode en vez de un string, puede dar
+        #      problemas tambien pero u'abc' == 'abc, asi que veremos a ver
+        u.users = json.loads(msg_data[2])
         state += 1
         send0(s,u.getData())
     elif state == 2:
         # Recibe randoms[] y envia ACK
-        u.randoms = msg_data[2]
+        u.randoms = json.loads(msg_data[2])
         state += 1
         send0(s,'ACK')
     elif state == 3:
         # Recibe el MAuth, genera el H, K y hi
-        u.recoverMsg(msg_data[2])
-        print u.genH()
+        hlocal = u.recoverMsg(json.loads(msg_data[2]))
+        if u.genH() == hlocal[2]:
+            print 'ALL OK'
+        else: 
+            # TODO Fallo del algoritmo, no se ha comprobado envia FAIL y vuelve
+            print 'FAIL'
+            return 0
         # Generacion de H,K,hi
         # Comprobacion
         # Envio

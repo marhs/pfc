@@ -50,15 +50,14 @@ class User:
     # Coge el mensaje M y devuelve el g si+r correspondiente al usuario. 
     # Ahora toca JSON JSON JSON 
     def recoverMsg(self, m): 
-        print '  Mensaje:',m
         # Recorremos los M sin el Auth. 
         for n in m[:-1]: 
-            print '    M:',n
             #self.publicValues.append(n[0])
             #self.publicUsers.append(n[1])
             if n[1] == self.name:
                 self.msg = n
         if self.msg:
+            print self.msg
             return self.msg
         else:
             return False
@@ -66,5 +65,7 @@ class User:
     def genH(self):
         r = [self.name, self.msg[0], self.subkey, self.random]
         return hs(r)
+
+
 
 

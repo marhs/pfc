@@ -2,6 +2,8 @@
  
 import socket, select, sys
 import kgc
+
+import json
 state = 0 
 participants = []
 
@@ -17,11 +19,11 @@ def broadcast_data (message):
     # TODO Enviar en json y recibir en json
     global state
     print '[',state,'] SENT:', message 
-    message = str(k.state)+':server:'+str(message)
+    message = str(k.state)+':server:'+json.dumps(message)
     for socket in CONNECTION_LIST:
         if socket != server_socket:
             try :
-                socket.send(str(message))
+                socket.send(message)
             except :
                 # Si ha fallado el socket.send() es que el socket no esta activo, por lo
                 # tanto habria que parar el protocolo. TODO 
@@ -33,7 +35,7 @@ def broadcast_data (message):
 def processData(sock,data):
     global state
     print '[',state,'] RECV:', data  
-    d = data.split(':')
+    d = data.split(':',2)
     if len(d)!=3:
         return False
 
