@@ -107,7 +107,7 @@ class KeyGenerationCenter:
         si = self.subkeys[ui]
         si1 = self.key - si
 
-        g = calculaClave(si+ri,GENERATOR,MODULUS)
+        g = calculaClave(si1+ri,GENERATOR,MODULUS)
         h = [ui,g,si,ri]
         print '    GenH:',h
         hashMsg = hs(h)
