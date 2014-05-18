@@ -38,6 +38,7 @@ class KeyGenerationCenter:
         elif s == 3:
             return self.sendMessage()
 
+
     def addUser(self,user):
     # Inicio de protocolo, limpia los parametros activos
 
@@ -65,6 +66,7 @@ class KeyGenerationCenter:
         self.active += 1
         if self.active == self.numUsers:
             self.state += 1
+            self.resetUserRdy()
         print ' [Active]', self.active ,'/',self.numUsers
         return self.state
     # Genera S
@@ -137,3 +139,28 @@ class KeyGenerationCenter:
         for n in self.users:
             res.append(self.randoms[n])
         return hs(res)
+
+    # Comprueba si el hi recibido desde user es correcto y el que deberia ser
+    # en caso de que todos los users pasen esto, finaliza el protocolo
+    def checkHi(self, msg, user):
+        if self.generateHi(user) == msg:
+            self.active += 1
+            if self.active == len(self.users):
+                self.finish(1)
+            return 4
+        else:
+            self.finish(0)
+            return 0
+
+
+    # Operaciones de finalizacion del intercambio
+    def finish(self, st):
+        # TODO Cerrar todos los sockets de comunicacion. 
+        if st != 1:
+            return False
+        # TODO Devolver por pantalla la clave. 
+        print '[FIN] Acuerdo de clave completo. '
+        print '      Clave:',self.k
+        self.state = 5
+
+        return True

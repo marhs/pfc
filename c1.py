@@ -69,6 +69,9 @@ def processData(s,msg):
         state += 1
         send0(s,u.getData())
         return 0
+    elif state == 5:
+        u.finish() 
+        # FINISH SEQ
     elif state > 2:
         return True
 # connect to remote host

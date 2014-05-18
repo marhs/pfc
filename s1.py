@@ -89,7 +89,11 @@ def processData(sock,data):
     elif d[0] == '4':
         print 'Datos recibidos 4'
         #print k.generateHi()
-        print d[2] == k.generateHi(d[1])
+        state = k.checkHi(d[2],d[1])
+        if k.state == 5:
+            broadcast_data('True')
+
+        
     return True
 
 

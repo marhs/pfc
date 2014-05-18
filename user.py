@@ -41,7 +41,10 @@ class User:
             return 'ACK'
         if s == 4:
             # TODO Add conditionals to pass
+            self.state += 1
             return self.computeHi()
+        if s == 5:
+            return self.finish()
         
         ## Espero que se haya hecho el recover msg
 
@@ -109,4 +112,12 @@ class User:
     def compruebaAuth(self):
 
         return False
+
+    # Finaliza acuerdo de clave
+    def finish(self):
+
+        print '[FIN] Acuerdo de clave completo. '
+        print '      Clave:',self.key
+
+        return True
 
