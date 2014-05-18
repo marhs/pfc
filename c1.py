@@ -102,7 +102,6 @@ while 1:
             else :
                 # Ha recibido datos
                 # Comprobar el estado, si todo va bien, enviar el siguiente estado
-                #print 'Data received: ', data
                 processData(s,data)
                 
          

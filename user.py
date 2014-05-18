@@ -5,7 +5,8 @@ from utils import *
 # Parametros en comun, grupo generador, etc
 GENERATOR = 17
 #MODULUS   = getrandbits(1024)
-MODULUS   = 15643
+MODULUS   = 156431412343
+
 
 KEYSIZE = 128
 
@@ -64,7 +65,6 @@ class User:
             if n[1] == self.name:
                 self.msg = n
         if self.msg:
-            print self.msg
             return self.msg
         else:
             return False
@@ -75,12 +75,9 @@ class User:
 
     def recoverKey(self):
 
-        print self.msg
-        print type(self.msg)
         sr1 = calculaClave(self.subkey,GENERATOR,MODULUS)
         r1 = calculaClave(self.random,GENERATOR,MODULUS)
         self.key = keyRecover(sr1,self.msg[0],r1,MODULUS)
-        print self.key
         return self.key
 
     def generateAuth(self):
@@ -101,7 +98,6 @@ class User:
         for n in self.publicUsers:
             res.append(self.publicRandoms[n])
 
-        print res
         return hs(res)
     # TODO
     def compruebaH(self):

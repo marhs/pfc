@@ -46,7 +46,6 @@ def processData(sock,data):
 
         # Llega el nombre - addUser
         if d[0] == '0':
-            print '    Adding participant '+str(d[2])
             state = k.addUser(d[1]) # TODO Que hace esto? Mejor/que devuelve?
             # Entonces envia la clave
             msg_sent = '0:server:'+str(k.subkeys[d[1]])
@@ -64,7 +63,6 @@ def processData(sock,data):
         if state == 1:
             msg_sent = k.getData()
             broadcast_data(msg_sent)
-            #k.resetUserRdy()
             return True
 
 
@@ -78,7 +76,6 @@ def processData(sock,data):
 
     elif d[0] == '3':
         # Recibe los ACK de todos los participantes y envia el M,Auth
-        print '    ',d
         if d[2] == 'ACK':
             state = k.userRdy()
         if state == 3:
@@ -87,8 +84,6 @@ def processData(sock,data):
 
 
     elif d[0] == '4':
-        print 'Datos recibidos 4'
-        #print k.generateHi()
         state = k.checkHi(d[2],d[1])
         if k.state == 5:
             broadcast_data('True')

@@ -5,7 +5,7 @@ from utils import *
 # Parametros en comun, grupo generador, etc
 GENERATOR = 17
 #MODULUS   = getrandbits(1024)
-MODULUS   = 15643
+MODULUS   = 156431412343
 
 KEYSIZE = 128
 
@@ -67,13 +67,11 @@ class KeyGenerationCenter:
         if self.active == self.numUsers:
             self.state += 1
             self.resetUserRdy()
-        print ' [Active]', self.active ,'/',self.numUsers
         return self.state
     # Genera S
     def generateKey(self, keySize):
         s = getrandbits(self.keySize)
         self.k = calculaClave(s,GENERATOR,MODULUS)
-        print '    CLAVE:',self.k
         return s
 
     # Divide S en 2 partes por cada usuario. 
@@ -112,7 +110,6 @@ class KeyGenerationCenter:
         g = calculaClave(si1+ri,GENERATOR,MODULUS)
         self.subk[ui] = g
         h = [ui,g,si,ri]
-        print '    GenH:',h
         hashMsg = hs(h)
         message = [g,ui,hashMsg]
         return message
