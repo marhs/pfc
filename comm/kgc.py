@@ -6,6 +6,7 @@ from utils import *
 GENERATOR = 17
 #MODULUS   = getrandbits(1024)
 MODULUS   = 156431412343
+#MODULUS =19550235927307083440054695612358531084944020582733423559498026006885889846837203202394738273571323894323128697432887000133230027946925224117548714912282882284936474903101894318334954325904200515232369013007948470835560263267168474167123159156978856947906463414127870757350416082973157138057134576785904471413L 
 
 KEYSIZE = 128
 
@@ -13,6 +14,7 @@ class KeyGenerationCenter:
 
     def __init__(self, keySize, users):
 
+        self.name = 'kgc'
         self.keySize = keySize
         self.key = self.generateKey(keySize) # TODO En su momento
 
@@ -31,11 +33,11 @@ class KeyGenerationCenter:
 
         # Cuando hay que esperar varios mensajes. 
         self.active = 0
+    
+    def register(self,user):
+        return self.addUser(user)
 
-
-        return data
-
-    def compruebaDatosDeEstado(numEstado):
+    def compruebaDatosDeEstado(self, numEstado):
         # TODO Comprobar que para estado se cumplen las condiciones antes de
         #      pasar al siguiente
         self.state += 1
@@ -46,7 +48,7 @@ class KeyGenerationCenter:
     def send_message(self):
         # Comprueba si tiene todo lo necesario para el estado actual
         # If todo correcto, s++
-        if compruebaDatosDeEstado(self.state) == -1 :
+        if self.compruebaDatosDeEstado(self.state) == -1 :
             return False
         # Ejecuta las acciones y devuelve los datos. 
         
@@ -55,46 +57,53 @@ class KeyGenerationCenter:
         # Hay que tener en cuenta que estoy trabajando con el estado de abajo
         if s == 1:
             # Envia el mensaje 1, BROADCAST
-            data = self.users
+            msgdata = self.users
+            data = [1,'kgc','broadcast',msgdata]
         elif s == 2:
             # Envia M,Auth - BROADCAST
-            data = self.sendMessage()
-
+            msgdata = self.generaMensaje()
+            data = [3,'kgc','broadcast',msgdata]
+        elif s == 3:
+            data = []
         return data
 
     def receive_message(self, message):
 
         msgId = message[0]
         msgSrc = message[1]
-        msgData = message[2]
+        msgDst = message[2]
+        msgData = message[3]
         
         if msgId == 0:
-            # Mensaje inicial
-            # init() o algo asi
+            # TODO Cambiar a eliminar los que no vengan en este mensaje
+            for n in msgData:
+                self.addUser(n)
         elif msgId == 2:
             # Recibe los randoms ri
-            
+            self.randoms[msgSrc] = msgData
         elif msgId == 4:
             # Recibe el h'i
-## A partir de aqui nada vale. Todo son mentiras. Lies. Like the cake.
+            self.checkHi(msgData,msgSrc)
+    
+    # Empieza en S1 y al acabar pasa a S2.
+    def recibeRandom(self, user, random):
+        self.randoms[user] = random
+
+        return self.state
 
     def addUser(self,user):
     # Inicio de protocolo, limpia los parametros activos
-
+        if user in self.users:
+            return True
         self.users.append(user)
         self.subkeys[user] = self.generateSubKey()
         #if len(self.users) == self.numUsers:
         #    self.state += 1
             # TODO Enviar users()
-        return self.state
+        return self.subkeys[user]
 
-    # Empieza en S1 y al acabar pasa a S2.
-    def recibeRandom(self, user, random):
-        self.randoms[user] = random
-        if len(self.randoms) == self.numUsers:
-            self.state += 1
-            # TODO Enviar randoms()
-        return self.state
+## A partir de aqui nada vale. Todo son mentiras. Lies. Like the cake.
+
             
 
     def resetUserRdy(self):
@@ -182,9 +191,7 @@ class KeyGenerationCenter:
     def checkHi(self, msg, user):
         if self.generateHi(user) == msg:
             self.active += 1
-            if self.active == len(self.users):
-                self.finish(1)
-            return 4
+            return True
         else:
             self.finish(0)
             return 0
@@ -196,7 +203,7 @@ class KeyGenerationCenter:
         if st != 1:
             return False
         # TODO Devolver por pantalla la clave. 
-        prina '[FIN] Acuerdo de clave completo. '
+        print '[FIN] Acuerdo de clave completo. '
         print '      Clave:',self.k
         self.state = 5
 

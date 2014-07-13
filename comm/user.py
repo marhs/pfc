@@ -7,29 +7,36 @@ GENERATOR = 17
 #MODULUS   = getrandbits(1024)
 MODULUS   = 156431412343
 
-
+#MODULUS =19550235927307083440054695612358531084944020582733423559498026006885889846837203202394738273571323894323128697432887000133230027946925224117548714912282882284936474903101894318334954325904200515232369013007948470835560263267168474167123159156978856947906463414127870757350416082973157138057134576785904471413L 
 KEYSIZE = 128
 
 class User:
 
-    def __init__(self, name):
+    def __init__(self, name, leader=0):
         self.name = name
         self.random = -1 
         self.key = -1
         self.subkey = -1
-
+        self.leader = leader
         # Msg = M,Auth
         self.msg = []
 
         # Valores del sistema
         self.publicUsers = []
-        self.publicRandoms = []
+        self.publicRandoms = dict()
         self.publicValues = []
 
         # Estado del usuario. 
         self.state = 0
+    
+    # TODO Se supone que esto es seguro
+    def register(self,subkey):
+        self.subkey = subkey 
 
-    def compruebaDatosDeUser(numEstado):
+    def isLeader(self):
+        return self.leader == 1
+
+    def compruebaDatosDeUser(self,numEstado):
         # TODO Comprobar que para estado se cumplen las condiciones antes de
         #      pasar al siguiente
         self.state += 1
@@ -38,37 +45,52 @@ class User:
     def send_message(self):
 
         # Comprueba que los datos para dicho estado esten correctamente. 
-        if compruebaDatosDeUser(self.state) == -1:
+        if self.compruebaDatosDeUser(self.state) == -1:
             return False
 
         s = self.state
         data = []
         if s == 1:
             # Envia la lista de participantes si es el lider
-            # if isLeader()...
-            data = []
+            if self.isLeader():
+                data = [0,self.name,'kgc',self.publicUsers]
+            else:
+                data = []
         if s == 2:
             # self.checklistParticipants() TODO Add condicion de parada
-            data = self.generateRandom()
+            msgdata = self.generateRandom()
+            self.recibeRandom(self.name,msgdata)
+            data = [2,self.name,'broadcast',msgdata]
         if s == 3:
-            data = self.computeHi()
+            self.recoverKey()
+            msgdata = self.computeHi()
         
+            data = [4,self.name,'kgc',msgdata]
         return data
 
     def receive_message(self, message):
 
         msgId = message[0]
         msgSrc = message[1]
-        msgData = message[2]
+        msgDst = message[2]
+        msgData = message[3]
         
         if msgId == 1:
             # Mensaje inicial
-            # init() o algo asi
+            # init(msgData) o algo asi
+            if self.publicUsers == []:
+                self.publicUsers = msgData
         elif msgId == 2:
             # Recibe los randoms ri de los otros.
+            self.recibeRandom(msgSrc,msgData)
         elif msgId == 3:
-            # Recibe el h'i
+            # Recibe el MAuth
+            self.recoverMsg(msgData)
 
+    def recibeRandom(self, user, random):
+        self.publicRandoms[user] = random
+        return self.state
+            
 ## A partir de aqui todo es jauja
     
     def generateRandom(self):
@@ -76,12 +98,10 @@ class User:
         return self.random
     
     # Coge el mensaje M y devuelve el g si+r correspondiente al usuario. 
-    # Ahora toca JSON JSON JSON 
     def recoverMsg(self, m): 
         # Recorremos los M sin el Auth. 
         for n in m[:-1]: 
             self.publicValues.append(n[0])
-            self.publicUsers.append(n[1])
             if n[1] == self.name:
                 self.msg = n
         if self.msg:
