@@ -62,10 +62,20 @@ class KeyGenerationCenter:
 
         return data
 
-    def compruebaDatosDeEstado(self, estado):
+    def receive_message(self, message):
 
+        msgId = message[0]
+        msgSrc = message[1]
+        msgData = message[2]
         
-
+        if msgId == 0:
+            # Mensaje inicial
+            # init() o algo asi
+        elif msgId == 2:
+            # Recibe los randoms ri
+            
+        elif msgId == 4:
+            # Recibe el h'i
 ## A partir de aqui nada vale. Todo son mentiras. Lies. Like the cake.
 
     def addUser(self,user):

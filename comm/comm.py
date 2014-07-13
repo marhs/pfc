@@ -12,8 +12,9 @@ class Comm():
          
         pass
 
-    def routeMsg(remitente, destino, msg):
-
+    def routeMsg(mensajes):
+        for n in mensajes:
+            self.enviaMensaje(n)
         pass
 
     def bucle():

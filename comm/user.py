@@ -30,6 +30,8 @@ class User:
         self.state = 0
 
     def compruebaDatosDeUser(numEstado):
+        # TODO Comprobar que para estado se cumplen las condiciones antes de
+        #      pasar al siguiente
         self.state += 1
         return self.state 
     
@@ -52,6 +54,20 @@ class User:
             data = self.computeHi()
         
         return data
+
+    def receive_message(self, message):
+
+        msgId = message[0]
+        msgSrc = message[1]
+        msgData = message[2]
+        
+        if msgId == 1:
+            # Mensaje inicial
+            # init() o algo asi
+        elif msgId == 2:
+            # Recibe los randoms ri de los otros.
+        elif msgId == 3:
+            # Recibe el h'i
 
 ## A partir de aqui todo es jauja
     
