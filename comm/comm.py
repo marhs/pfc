@@ -16,7 +16,10 @@ class Comm():
         res = []
         res.append(User('user0',leader=1))
         self.userRegister(res[0])
-        res[0].publicUsers = ['user0','user1','user2','user3']
+        res[0].publicUsers = []
+        for n in range(numParticipantes):
+            res[0].publicUsers.append('user'+str(n))
+
         for n in range(1,numParticipantes):
             u = User('user'+str(n))
             res.append(u)
