@@ -12,14 +12,13 @@ KEYSIZE = 128
 
 class KeyGenerationCenter:
 
-    def __init__(self, keySize, users):
+    def __init__(self, keySize):
 
         self.name = 'kgc'
         self.keySize = keySize
         self.key = self.generateKey(keySize) # TODO En su momento
 
         self.state = 0
-        self.numUsers = users
 
         self.users = []
         self.randoms = dict()
@@ -76,6 +75,7 @@ class KeyGenerationCenter:
         
         if msgId == 0:
             # TODO Cambiar a eliminar los que no vengan en este mensaje
+            self.numUsers = len(msgData)
             for n in msgData:
                 self.addUser(n)
         elif msgId == 2:
@@ -208,3 +208,9 @@ class KeyGenerationCenter:
         self.state = 5
 
         return True
+
+    def clear(self):
+        # TODO Limpia lo necesario para volver a empezar un intercambio de clave
+        pass
+
+

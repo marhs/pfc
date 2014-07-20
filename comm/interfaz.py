@@ -24,26 +24,21 @@ class Example(wx.Frame):
         
     def InitUI(self):    
 
-        vbox = wx.BoxSizer(wx.VERTICAL)
+        kgc = comm.KeyGenerationCenter(1024)
+        self.c = comm.Comm(kgc,4)
+        texto = str(self.c.kgc.k)
 
-        toolbar1 = wx.ToolBar(self)
-        toolbar1.Realize()
 
-        toolbar2 = wx.ToolBar(self)
-        toolbar2.Realize()
+        pnl = wx.Panel(self)
+        cbtn = wx.Button(pnl, label='Close', pos=(80, 90))
+        cbtn.Bind(wx.EVT_BUTTON, self.OnButton)
 
-        vbox.Add(toolbar1, 0, wx.EXPAND)
-        vbox.Add(toolbar2, 0, wx.EXPAND)
+        wx.StaticText(self, label=texto, pos=(150, 80))
 
         wx.StaticLine(self, pos=(25, 50), size=(300,1)) 
         wx.StaticText(self, label='Key Agreement', pos=(25, 80))
 
-        kgc = comm.KeyGenerationCenter(1024,4)
-        c = comm.Comm(kgc,4)
-        c.bucle()
-        texto = str(c.kgc.k)
-        wx.StaticText(self, label=texto, pos=(150, 80))
-        self.SetSizer(vbox)
+
 
         self.SetSize((300, 250))
         self.SetTitle('Toolbars')
@@ -52,6 +47,10 @@ class Example(wx.Frame):
         
     def OnQuit(self, e):
         self.Close()
+
+    def OnButton(self,e):
+        self.comm.bucle()
+        print self.c.kgc.k
 
 def main():
     
