@@ -61,6 +61,7 @@ class Comm():
 
 
 ## TEST ZONE ##
+"""
 kgc = KeyGenerationCenter(1024,4) 
 comm = Comm(kgc,4)
 comm.bucle()
@@ -69,3 +70,4 @@ print comm.participants[0].key
 print comm.kgc.k
 for m in comm.messages:
     print m
+"""
