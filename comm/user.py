@@ -60,12 +60,17 @@ class User:
             data = [4,self.name,'kgc',msgdata]
         return data
 
-    def receive_message(self, message):
-
+    def descomponeCabeceras(self, message):
         msgId = message[0]
         msgSrc = message[1]
         msgDst = message[2]
         msgData = message[3]
+
+        return (msgId, msgSrc, msgDst, msgData)
+
+    def receive_message(self, message):
+
+        msgId, msgSrc, msgDst, msgData = self.descomponeCabeceras(message)
         
         if msgId == 1:
             # Mensaje inicial

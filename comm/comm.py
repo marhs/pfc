@@ -23,14 +23,14 @@ class Comm():
     def generateParticipants(self,numParticipantes):
         
         res = []
-        res.append(User('user0',leader=1))
+        res.append(User('Usuario 0',leader=1))
         self.userRegister(res[0])
         res[0].publicUsers = []
         for n in range(numParticipantes):
-            res[0].publicUsers.append('user'+str(n))
+            res[0].publicUsers.append('Usuario '+str(n))
 
         for n in range(1,numParticipantes):
-            u = User('user'+str(n))
+            u = User('Usuario '+str(n))
             res.append(u)
             self.userRegister(u)
         return res

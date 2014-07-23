@@ -44,25 +44,36 @@ class ConfigurationWindow(wx.Panel):
 
         
         # Numero de usuarios
-        self.spinUsers = wx.SpinCtrl(self, value='2', pos=(25,40), size=(60,-1))
+        wx.StaticText(self, label='Numero de usuarios', pos=(25, 26))
+        self.spinUsers = wx.SpinCtrl(self, value='2', pos=(165,25), size=(60,-1))
         self.spinUsers.SetRange(2,100)
-        wx.StaticText(self, label='Numero de usuarios', pos=(120, 41))
 
         # Boton de inicio
-        self.cbtn = wx.Button(self, label='Iniciar', pos=(20, 100))
+        self.cbtn = wx.Button(self, label='Iniciar', pos=(220, 21))
 
 
         # Inspector de usuarios
+        wx.StaticText(self, label='Informacion:', pos=(25, 66))
         users = []
-        self.comboUsers = wx.ComboBox(self, pos=(25,200), choices=users, style=wx.CB_READONLY)
+        self.comboUsers = wx.ComboBox(self, pos=(160,63), choices=users, style=wx.CB_READONLY)
     
             # Text area
-        wx.StaticBox(self, label='Inspector', pos=(25,250), size=(250,300))
-        wx.StaticText(self, label='Id:', pos=(40,280))
-        self.inspectorId = wx.StaticText(self, label='', pos=(70,280))
-        wx.StaticText(self, label='Clave:', pos=(40,310))
-        self.inspectorKey = wx.StaticText(self, label='', pos=(40,330))
+        wx.StaticBox(self, label='Inspector', pos=(25,110), size=(290,450))
+        self.l1 = wx.StaticText(self, label='Id:', pos=(37,140))
+        self.l2 = wx.StaticText(self, label='', pos=(37,165))
+        self.l3 = wx.StaticText(self, label='', pos=(37,190))
+        self.inspectorId = wx.StaticText(self, label='', pos=(70,140))
+        self.inspectorSrc = wx.StaticText(self, label='', pos=(70,165))
+        self.inspectorDst = wx.StaticText(self, label='', pos=(70,190))
+        self.inspectorKeyText = wx.StaticText(self, label='Clave acordada', pos=(37,220))
+        self.inspectorKey = wx.TextCtrl(self, pos=(40,250), size=(263,300), style=wx.TE_MULTILINE)
+        self.inspectorKey.SetEditable(False)
 
+    def ClearValues(self):
+
+        self.inspectorId.SetLabel("")
+        self.inspectorKey.ChangeValue("")
+        self.comboUsers.Clear()
 
 class MainWindow(wx.Frame):
 
@@ -76,13 +87,14 @@ class MainWindow(wx.Frame):
 
         self.p1 = ConfigurationWindow(self.splitter, -1, 'wololo')
         self.p2 = MessageList(self.splitter, -1)
-        self.splitter.SplitVertically(self.p1, self.p2)
-        self.splitter.SetSashGravity(0.0)
+        self.splitter.SplitVertically(self.p1, self.p2,330)
 
         self.p1.cbtn.Bind(wx.EVT_BUTTON, self.OnButton)
-        self.p1.comboUsers.Bind(wx.EVT_COMBOBOX, self.OnSelect)
+        self.p1.comboUsers.Bind(wx.EVT_COMBOBOX, self.ChangeInspectorUser)
 
-        self.SetSize((800, 600))
+        self.p2.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnSelectList)
+        
+        self.SetSize((900, 600))
         self.SetTitle('Toolbars')
         self.Centre()
         self.Show(True)
@@ -91,7 +103,8 @@ class MainWindow(wx.Frame):
     def Reset(self):
 
         self.p2.DeleteAllItems()
-        self.p1.comboUsers.Clear()
+        self.p1.ClearValues()
+
 
     def OnButton(self,e):
        
@@ -113,16 +126,43 @@ class MainWindow(wx.Frame):
         self.p1.comboUsers.Append('kgc')
         self.p1.comboUsers.AppendItems([x.name for x in self.c.participants])
 
-    def OnSelect(self,e):
-       
+    def ChangeInspectorUser(self,e):
+        self.p1.inspectorSrc.SetLabel("")
+        self.p1.inspectorDst.SetLabel("")
+        self.p1.l2.SetLabel("")
+        self.p1.l3.SetLabel("")
+        self.p1.inspectorKeyText.SetLabel("Clave acordada")
         selection = e.GetSelection()
         if selection == 0:
             # KGC
             self.p1.inspectorId.SetLabel('kgc')
-            self.p1.inspectorKey.SetLabel(str(self.c.kgc.k))
+            self.p1.inspectorKey.ChangeValue(str(self.c.kgc.k))
         else:
-            self.p1.inspectorKey.SetLabel(str(self.c.participants[selection-1].key))
+            self.p1.inspectorKey.ChangeValue(str(self.c.participants[selection-1].key))
             self.p1.inspectorId.SetLabel(self.c.participants[selection-1].name)
+
+    def OnSelectList(self, e):
+
+        index = e.GetIndex()
+        s = self.c.messages[index]
+        if s == -1:
+            return 0
+        else:
+            self.ChangeInspectorList(s[0],s[1],s[2],s[3])
+                
+
+
+    def ChangeInspectorList(self, idn, src, dst, data):
+
+        self.p1.l2.SetLabel("Src:")
+        self.p1.l3.SetLabel("Dst:")
+
+        self.p1.inspectorId.SetLabel(str(idn))
+        self.p1.inspectorSrc.SetLabel(src)
+        self.p1.inspectorDst.SetLabel(dst)
+
+        self.p1.inspectorKeyText.SetLabel("Mensaje")
+        self.p1.inspectorKey.ChangeValue(str(data))
 
 
 def main():
