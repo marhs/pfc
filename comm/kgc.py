@@ -2,21 +2,13 @@ from random import SystemRandom
 from random import getrandbits
 from utils import *
 
-# Parametros en comun, grupo generador, etc
-GENERATOR = 17
-#MODULUS   = getrandbits(1024)
-MODULUS   = 156431412343
-#MODULUS =19550235927307083440054695612358531084944020582733423559498026006885889846837203202394738273571323894323128697432887000133230027946925224117548714912282882284936474903101894318334954325904200515232369013007948470835560263267168474167123159156978856947906463414127870757350416082973157138057134576785904471413L 
-
-KEYSIZE = 128
-
 class KeyGenerationCenter:
 
-    def __init__(self, keySize):
+    def __init__(self):
 
         self.name = 'kgc'
-        self.keySize = keySize
-        self.key = self.generateKey(keySize) # TODO En su momento
+        self.keySize = 1536
+        self.secret = 0 
 
         self.state = 0
 
@@ -27,9 +19,11 @@ class KeyGenerationCenter:
         # Parametros del intercambio
         self.message = []
         self.auth = []
-        self.k = calculaClave(self.key,GENERATOR,MODULUS) # TODO En su momento
+        self.k = 0 
         self.subk  = dict() # Que carajo es esto. 
 
+        self.iniciaClave()
+    
         # Cuando hay que esperar varios mensajes. 
         self.active = 0
     
@@ -42,8 +36,12 @@ class KeyGenerationCenter:
         self.state += 1
         return self.state 
 
+    def iniciaClave(self):
+        
+        self.secret = self.generateKey(self.keySize) # TODO En su momento
+        self.k = calculaClave(self.secret,GENERATOR,MODULUS) # TODO En su momento
+
     # Cambia al estado siguiente y envia el mensaje. \
-    
     def send_message(self):
         # Comprueba si tiene todo lo necesario para el estado actual
         # If todo correcto, s++
@@ -66,15 +64,20 @@ class KeyGenerationCenter:
             data = []
         return data
 
-    def receive_message(self, message):
-
+    def descomponeCabeceras(self, message):
         msgId = message[0]
         msgSrc = message[1]
         msgDst = message[2]
         msgData = message[3]
-        
+
+        return (msgId, msgSrc, msgDst, msgData)
+
+    def receive_message(self, message):
+
+        msgId, msgSrc, msgDst, msgData = self.descomponeCabeceras(message)
         if msgId == 0:
             # TODO Cambiar a eliminar los que no vengan en este mensaje
+
             self.numUsers = len(msgData)
             for n in msgData:
                 self.addUser(n)
@@ -136,7 +139,7 @@ class KeyGenerationCenter:
     def generateSubKey(self):
 
         subkey = getrandbits(self.keySize)
-        while subkey > self.key:
+        while subkey > self.secret:
             subkey = getrandbits(self.keySize)
 
         return subkey
@@ -154,7 +157,7 @@ class KeyGenerationCenter:
         ui = self.users[indice]
         ri = self.randoms[ui]
         si = self.subkeys[ui]
-        si1 = self.key - si
+        si1 = self.secret - si
 
         g = calculaClave(si1+ri,GENERATOR,MODULUS)
         self.subk[ui] = g
@@ -176,7 +179,7 @@ class KeyGenerationCenter:
 
     # Devuelve si' (la que se envia, creo)
     def getSubKey(self, user):
-        return self.key - self.subkeys[user] 
+        return self.secret - self.subkeys[user] 
 
 
     def generateHi(self,user):

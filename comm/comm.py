@@ -10,7 +10,16 @@ class Comm():
         self.kgc = kgc
         self.participants = self.generateParticipants(participantes)
         self.messages = []
+    
+        return None
+
+    def clear(self):
+
+        self.messages = []
+        self.registerMessages = []
         
+        return True
+
     def generateParticipants(self,numParticipantes):
         
         res = []
@@ -27,9 +36,15 @@ class Comm():
         return res
     
     def userRegister(self,user):
-
+        
+        
+        #msg = [10,'kgc',user.name,rsaData]
+        
+        
         subkey = self.kgc.register(user.name)
         user.register(subkey)
+        
+        return user
     
 
     def routeMsg(self,mensaje):
@@ -60,7 +75,7 @@ class Comm():
             # Turno del KGC
             self.routeMsg(self.kgc.send_message())
 
-        return self.kgc.key
+        return self.kgc.secret
 
 
 ## TEST ZONE ##

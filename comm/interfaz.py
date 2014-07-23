@@ -45,19 +45,23 @@ class ConfigurationWindow(wx.Panel):
         
         # Numero de usuarios
         self.spinUsers = wx.SpinCtrl(self, value='2', pos=(25,40), size=(60,-1))
-        self.spinUsers.SetRange(2,10)
+        self.spinUsers.SetRange(2,100)
         wx.StaticText(self, label='Numero de usuarios', pos=(120, 41))
-
-        # Size of the key
-        keys = ['128','256','512','1024']
-        self.comboKeys = wx.ComboBox(self,pos=(25,70),choices=keys,style=wx.CB_READONLY)
-        wx.StaticText(self, label='Tamano de clave', pos=(120, 71))
 
         # Boton de inicio
         self.cbtn = wx.Button(self, label='Iniciar', pos=(20, 100))
 
 
-
+        # Inspector de usuarios
+        users = []
+        self.comboUsers = wx.ComboBox(self, pos=(25,200), choices=users, style=wx.CB_READONLY)
+    
+            # Text area
+        wx.StaticBox(self, label='Inspector', pos=(25,250), size=(250,300))
+        wx.StaticText(self, label='Id:', pos=(40,280))
+        self.inspectorId = wx.StaticText(self, label='', pos=(70,280))
+        wx.StaticText(self, label='Clave:', pos=(40,310))
+        self.inspectorKey = wx.StaticText(self, label='', pos=(40,330))
 
 
 class MainWindow(wx.Frame):
@@ -76,15 +80,24 @@ class MainWindow(wx.Frame):
         self.splitter.SetSashGravity(0.0)
 
         self.p1.cbtn.Bind(wx.EVT_BUTTON, self.OnButton)
+        self.p1.comboUsers.Bind(wx.EVT_COMBOBOX, self.OnSelect)
 
         self.SetSize((800, 600))
         self.SetTitle('Toolbars')
         self.Centre()
         self.Show(True)
 
+    # Elimina los valores generados anteriormente
+    def Reset(self):
+
+        self.p2.DeleteAllItems()
+        self.p1.comboUsers.Clear()
+
     def OnButton(self,e):
-        
-        kgc = comm.KeyGenerationCenter(int(self.p1.comboKeys.GetValue()))
+       
+        # Limpiar los valores anteriores
+        self.Reset()
+        kgc = comm.KeyGenerationCenter()
         self.c = comm.Comm(kgc,self.p1.spinUsers.GetValue())
         self.c.bucle()
         j = 0
@@ -95,7 +108,23 @@ class MainWindow(wx.Frame):
             self.p2.SetStringItem(j,2,str(mDst))
             self.p2.SetStringItem(j,3,str(mData))
             j += 1
-        print self.c.kgc.k
+
+        # Fill the inspector
+        self.p1.comboUsers.Append('kgc')
+        self.p1.comboUsers.AppendItems([x.name for x in self.c.participants])
+
+    def OnSelect(self,e):
+       
+        selection = e.GetSelection()
+        if selection == 0:
+            # KGC
+            self.p1.inspectorId.SetLabel('kgc')
+            self.p1.inspectorKey.SetLabel(str(self.c.kgc.k))
+        else:
+            self.p1.inspectorKey.SetLabel(str(self.c.participants[selection-1].key))
+            self.p1.inspectorId.SetLabel(self.c.participants[selection-1].name)
+
+
 def main():
     
     ex = wx.App()

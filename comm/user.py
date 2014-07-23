@@ -2,14 +2,6 @@ from random import SystemRandom
 from random import getrandbits
 from utils import *
 
-# Parametros en comun, grupo generador, etc
-GENERATOR = 17
-#MODULUS   = getrandbits(1024)
-MODULUS   = 156431412343
-
-#MODULUS =19550235927307083440054695612358531084944020582733423559498026006885889846837203202394738273571323894323128697432887000133230027946925224117548714912282882284936474903101894318334954325904200515232369013007948470835560263267168474167123159156978856947906463414127870757350416082973157138057134576785904471413L 
-KEYSIZE = 128
-
 class User:
 
     def __init__(self, name, leader=0):
@@ -94,7 +86,7 @@ class User:
 ## A partir de aqui todo es jauja
     
     def generateRandom(self):
-        self.random = getrandbits(KEYSIZE)
+        self.random = getrandbits(512)
         return self.random
     
     # Coge el mensaje M y devuelve el g si+r correspondiente al usuario. 
