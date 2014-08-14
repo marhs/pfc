@@ -37,7 +37,6 @@ class Comm():
     
     def userRegister(self,user):
         
-        
         #msg = [10,'kgc',user.name,rsaData]
         
         
