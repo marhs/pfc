@@ -30,11 +30,11 @@ def resumen(parametros):
 def encoder(element):
     return str(element).encode()
 
+# Funcion resumen usada durante el protocolo
 def hs(listaElementos):
-    res = sha1()
+    res = sha1() # Aqui se selecciona la funcion resumen deseada
     for element in listaElementos:
         res.update(encoder(element))
-
     return res.hexdigest()
 
 

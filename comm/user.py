@@ -12,6 +12,7 @@ class User:
         self.leader = leader
         # Msg = M,Auth
         self.msg = []
+        self.mAuth = []
 
         # Valores del sistema
         self.publicUsers = []
@@ -21,8 +22,8 @@ class User:
         # Estado del usuario. 
         self.state = 0
     
-    # TODO Se supone que esto es seguro
     def register(self,subkey):
+        # La implementacion del registro se deja abierta
         self.subkey = subkey 
 
     def isLeader(self):
@@ -54,9 +55,12 @@ class User:
             self.recibeRandom(self.name,msgdata)
             data = [2,self.name,'broadcast',msgdata]
         if s == 3:
+            # TODO Comprueba mensajes
             self.recoverKey()
             msgdata = self.computeHi()
         
+            if not self.compruebaAuth(self.mAuth):
+                self.error(1)
             data = [4,self.name,'kgc',msgdata]
         return data
 
@@ -82,13 +86,32 @@ class User:
             self.recibeRandom(msgSrc,msgData)
         elif msgId == 3:
             # Recibe el MAuth
+            if not self.compruebaH(msgData):
+                self.error(0)
             self.recoverMsg(msgData)
 
     def recibeRandom(self, user, random):
         self.publicRandoms[user] = random
         return self.state
-            
+    
+    def compruebaH(self, mensaje):
+        men = []
+        # mensaje = [m1,m2,...,mn,Auth]
+        for n in mensaje:
+            if n[1] == self.name:
+                men = n    
+
+        ui = self.name
+        ri = self.random
+        si = self.subkey
+
+        g = men[0]
+        sol = hs([ui, g, si, ri])
+
+        return men[2] == sol
+
 ## A partir de aqui todo es jauja
+## TODO Borrar o arreglar, pero esto tiene que quedar vacio. 
     
     def generateRandom(self):
         self.random = getrandbits(512)
@@ -96,6 +119,7 @@ class User:
     
     # Coge el mensaje M y devuelve el g si+r correspondiente al usuario. 
     def recoverMsg(self, m): 
+        self.mAuth = m
         # Recorremos los M sin el Auth. 
         for n in m[:-1]: 
             self.publicValues.append(n[0])
@@ -136,21 +160,27 @@ class User:
             res.append(self.publicRandoms[n])
 
         return hs(res)
-    # TODO
-    def compruebaH(self):
 
-        return False
+    def clear(self):
+        self.state = 0
 
-    # TODO
-    def compruebaAuth(self):
+    def compruebaAuth(self, mensajes):
+        gs = []
+        for mensaje in mensajes[:-1]:
+            gs.append(mensaje[0])
+        b = self.publicUsers
+        a = []
+        c = []
+        for user in b:
+            c.append(self.publicRandoms[user])
 
-        return False
+        sol1 = hs([self.key]+gs+b+c) 
+        sol2 = mensajes[len(mensajes)-1]
+        return sol1 == sol2
 
-    # Finaliza acuerdo de clave
-    def finish(self):
+    def error(self, estado):
+        errorList = { 0 : 'No se puede verificar el mensaje de confirmacion',
+                      1 : 'No se puede verificar el mensaje de autenticacion',
+                      2 : 'Se ha recibido un mensaje que no correspondia'} 
 
-        print '[FIN] Acuerdo de clave completo. '
-        print '      Clave:',self.key
-
-        return True
-
+        return estado in errorList

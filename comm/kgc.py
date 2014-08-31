@@ -31,14 +31,17 @@ class KeyGenerationCenter:
         return self.addUser(user)
 
     def compruebaDatosDeEstado(self, numEstado):
-        # TODO Comprobar que para estado se cumplen las condiciones antes de
-        #      pasar al siguiente
         self.state += 1
         return self.state 
 
     def iniciaClave(self):
         
         self.secret = self.generateKey(self.keySize) # TODO En su momento
+        for n in self.subkeys:
+            if self.subkeys[n] > self.secret:
+                self.iniciaClave()
+
+
         self.k = calculaClave(self.secret,GENERATOR,MODULUS) # TODO En su momento
 
     # Cambia al estado siguiente y envia el mensaje. \
@@ -76,8 +79,6 @@ class KeyGenerationCenter:
 
         msgId, msgSrc, msgDst, msgData = self.descomponeCabeceras(message)
         if msgId == 0:
-            # TODO Cambiar a eliminar los que no vengan en este mensaje
-
             self.numUsers = len(msgData)
             for n in msgData:
                 self.addUser(n)
@@ -95,6 +96,7 @@ class KeyGenerationCenter:
         return self.state
 
     def addUser(self,user):
+        #print 'Adding user', user
     # Inicio de protocolo, limpia los parametros activos
         if user in self.users:
             return True
@@ -106,6 +108,7 @@ class KeyGenerationCenter:
         return self.subkeys[user]
 
 ## A partir de aqui nada vale. Todo son mentiras. Lies. Like the cake.
+## TODO Borrar o arreglar, pero esto tiene que quedar vacio. 
 
             
 
@@ -125,22 +128,13 @@ class KeyGenerationCenter:
         self.k = calculaClave(s,GENERATOR,MODULUS)
         return s
 
-    # Divide S en 2 partes por cada usuario. 
-    def generateSubKeys(self):
-        # Primero limpia las subclaves que pudiesen existir
-        self.subkeys = dict()
-        for client in self.users:
-            key = self.generateSubKey()
-            self.subkeys[client] = key
-
-        return self.users
 
     # Divide S en 2 partes y lo devuelve (usado en la anterior)
     def generateSubKey(self):
 
         subkey = getrandbits(self.keySize)
         while subkey > self.secret:
-            subkey = getrandbits(self.keySize)
+            subkey = getrandbits(self.keySize-100)
 
         return subkey
 
@@ -199,21 +193,7 @@ class KeyGenerationCenter:
             self.finish(0)
             return 0
 
-
-    # Operaciones de finalizacion del intercambio
-    def finish(self, st):
-        # TODO Cerrar todos los sockets de comunicacion. 
-        if st != 1:
-            return False
-        # TODO Devolver por pantalla la clave. 
-        print '[FIN] Acuerdo de clave completo. '
-        print '      Clave:',self.k
-        self.state = 5
-
-        return True
-
     def clear(self):
-        # TODO Limpia lo necesario para volver a empezar un intercambio de clave
-        pass
-
+        self.state = 0
+        self.iniciaClave()
 

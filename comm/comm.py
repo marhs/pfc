@@ -2,6 +2,7 @@
 # Es el encargado de gestionar la comunicacion entre participantes y kgc
 from user import User 
 from kgc import KeyGenerationCenter
+from time import time
 
 class Comm():
 
@@ -10,7 +11,8 @@ class Comm():
         self.kgc = kgc
         self.participants = self.generateParticipants(participantes)
         self.messages = []
-    
+        self.time = 0
+        
         return None
 
     def clear(self):
@@ -66,25 +68,55 @@ class Comm():
 
     def bucle(self):
         states = 3
+        start_time = time()
         for n in range(states):
+            if n == 0:
+                self.kgc.clear()
             # Empiezan los participantes
             for participant in self.participants:
+                if n == 0:
+                    participant.clear()
                 #print 'Bucle',n, 'user', participant.name
                 self.routeMsg(participant.send_message())
             # Turno del KGC
             self.routeMsg(self.kgc.send_message())
-
+        self.time = time() - start_time
+        
         return self.kgc.secret
 
+# Testea que se produzca el intercambio de clave correctamente entre todos
+def test(numUsers):
+    kgc = KeyGenerationCenter() 
+    comm = Comm(kgc,numUsers)
+    # Efectua el intercambio de clave
+    for n in range(2):
+        comm.bucle()
+        print '[kgc]',comm.kgc.k
+        print '[usrk]',comm.participants[0].key
+        print '[usrs]',comm.participants[0].subkey
+    # Comprueba que se haya efectuado convenientemente. 
+    key = comm.kgc.k
+    for n in comm.participants:
+        assert n.key == key
+    return comm.time
+    return True
 
-## TEST ZONE ##
-"""
-kgc = KeyGenerationCenter(1024,4) 
-comm = Comm(kgc,4)
-comm.bucle()
-
-print comm.participants[0].key
-print comm.kgc.k
-for m in comm.messages:
-    print m
-"""
+import matplotlib.pyplot as plt
+def testTime(a,b, mean=1, step=1):
+    times = []
+    for n in range(a,b):
+        if n%step != 0:
+            continue
+        print 'Test', n
+        if mean == 1:
+            times.append(test(n))
+        else:
+            time_aux = []
+            for m in range(mean):
+                time_aux.append(test(n))
+            times.append(sum(time_aux)/len(time_aux))
+    plt.plot(times)
+    plt.ylabel('Tiempo (s)')
+    plt.xlabel('Numero de participantes')
+    plt.show()
+    return times
