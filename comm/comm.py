@@ -40,8 +40,6 @@ class Comm():
     def userRegister(self,user):
         
         #msg = [10,'kgc',user.name,rsaData]
-        
-        
         subkey = self.kgc.register(user.name)
         user.register(subkey)
         
@@ -101,22 +99,3 @@ def test(numUsers):
     return comm.time
     return True
 
-import matplotlib.pyplot as plt
-def testTime(a,b, mean=1, step=1):
-    times = []
-    for n in range(a,b):
-        if n%step != 0:
-            continue
-        print 'Test', n
-        if mean == 1:
-            times.append(test(n))
-        else:
-            time_aux = []
-            for m in range(mean):
-                time_aux.append(test(n))
-            times.append(sum(time_aux)/len(time_aux))
-    plt.plot(times)
-    plt.ylabel('Tiempo (s)')
-    plt.xlabel('Numero de participantes')
-    plt.show()
-    return times

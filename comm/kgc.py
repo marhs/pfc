@@ -36,13 +36,13 @@ class KeyGenerationCenter:
 
     def iniciaClave(self):
         
-        self.secret = self.generateKey(self.keySize) # TODO En su momento
+        self.secret = self.generateKey(self.keySize) 
         for n in self.subkeys:
             if self.subkeys[n] > self.secret:
                 self.iniciaClave()
 
 
-        self.k = calculaClave(self.secret,GENERATOR,MODULUS) # TODO En su momento
+        self.k = calculaClave(self.secret,GENERATOR,MODULUS) 
 
     # Cambia al estado siguiente y envia el mensaje. \
     def send_message(self):
@@ -102,15 +102,8 @@ class KeyGenerationCenter:
             return True
         self.users.append(user)
         self.subkeys[user] = self.generateSubKey()
-        #if len(self.users) == self.numUsers:
-        #    self.state += 1
-            # TODO Enviar users()
+        
         return self.subkeys[user]
-
-## A partir de aqui nada vale. Todo son mentiras. Lies. Like the cake.
-## TODO Borrar o arreglar, pero esto tiene que quedar vacio. 
-
-            
 
     def resetUserRdy(self):
         self.active = 0

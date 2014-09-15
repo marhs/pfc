@@ -230,6 +230,9 @@ class InspectorUserWindow(wx.Frame):
         self.inspectorKeyText.SetLabel('Clave acordada')
         self.inspectorKey.ChangeValue(str(self.participant.key))
 
+    def OnClose(self):
+        self.Close()
+
 class InspectorMsgWindow(wx.Frame):
 
     def __init__(self, parent, id, title):
@@ -253,9 +256,6 @@ class InspectorMsgWindow(wx.Frame):
         self.Centre()
         self.Show(False)
 
-
-
-
 def main():
     
     ex = wx.App()
@@ -264,8 +264,6 @@ def main():
     InspectorUserWindow(None,-1,'Main window')
     InspectorMsgWindow(None,-1,'Main window')
     ex.MainLoop()    
-
-
 
 if __name__ == '__main__':
     main()

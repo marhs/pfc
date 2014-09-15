@@ -30,8 +30,6 @@ class User:
         return self.leader == 1
 
     def compruebaDatosDeUser(self,numEstado):
-        # TODO Comprobar que para estado se cumplen las condiciones antes de
-        #      pasar al siguiente
         self.state += 1
         return self.state 
     
@@ -50,12 +48,10 @@ class User:
             else:
                 data = []
         if s == 2:
-            # self.checklistParticipants() TODO Add condicion de parada
             msgdata = self.generateRandom()
             self.recibeRandom(self.name,msgdata)
             data = [2,self.name,'broadcast',msgdata]
         if s == 3:
-            # TODO Comprueba mensajes
             self.recoverKey()
             msgdata = self.computeHi()
         
@@ -110,9 +106,6 @@ class User:
 
         return men[2] == sol
 
-## A partir de aqui todo es jauja
-## TODO Borrar o arreglar, pero esto tiene que quedar vacio. 
-    
     def generateRandom(self):
         self.random = getrandbits(512)
         return self.random
