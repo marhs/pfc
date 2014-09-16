@@ -3,6 +3,10 @@ from random import getrandbits
 from utils import *
 
 class KeyGenerationCenter:
+    """
+        Nota: El control de errores de este modulo, asi como el de los
+              usuarios, no esta terminado.
+    """
 
     def __init__(self):
 
@@ -20,7 +24,7 @@ class KeyGenerationCenter:
         self.message = []
         self.auth = []
         self.k = 0 
-        self.subk  = dict() # Que carajo es esto. 
+        self.subk  = dict() 
 
         self.iniciaClave()
     
@@ -31,6 +35,7 @@ class KeyGenerationCenter:
         return self.addUser(user)
 
     def compruebaDatosDeEstado(self, numEstado):
+        # TODO El control de errores de este protocolo no esta terminado
         self.state += 1
         return self.state 
 

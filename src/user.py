@@ -3,6 +3,10 @@ from random import getrandbits
 from utils import *
 
 class User:
+    """
+        Nota: El control de errores de este modulo, asi como el de los
+              usuarios, no esta terminado.
+    """
 
     def __init__(self, name, leader=0):
         self.name = name
@@ -30,6 +34,7 @@ class User:
         return self.leader == 1
 
     def compruebaDatosDeUser(self,numEstado):
+        # TODO Aqui se debe poner el control de errores
         self.state += 1
         return self.state 
     
