@@ -19,5 +19,5 @@ En este Trabajo Fin de Grado se ha realizado un estudio y una posterior implemen
 Open src/interfaz.py with your Python interpreter. 
 
 ##### Security note
-The main goal in this project is to let students visualize and experiment with an group key agreement protocol. This is a educational project, so it's encouraged not to use it in a production enviroment. It's not fully tested and may contain a lot of security problems.
-If you have any questions, feel free to mail me. 
+The main goal in this project is to let students visualize and experiment with a group key agreement protocol. This is a educational project, so it's encouraged not to use it in production enviroments. It's not fully tested and may contain a lot of security issues.
+If you have any questions, feel free to contact me. 
