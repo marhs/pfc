@@ -3,7 +3,7 @@ Marco Herrero <me@marhs.de>
 ### An authenticated group key transfer protocol based on secret sharing ###
 
 [English]
-In this End-of-Degree proyect has been conducted a study and subsequent implementa- tion of a group key agreement protocol. These keys are generated and distributed by a KGC (key generation center) using sharing secrets tech- niques. A graphic interface has been implemented in order to visualize the messages exchanged in this protocol.
+In this End-of-Degree project has been conducted a study and subsequent implementation of a group key agreement protocol. These keys are generated and distributed by a KGC (key generation center) using sharing secrets techniques. A graphic interface has been implemented in order to visualize the messages exchanged in this protocol.
 
 
 ### Un protocolo de transferencia de clave en grupo basado en comparticion de secretos. ###
